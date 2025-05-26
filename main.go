@@ -8,8 +8,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/burnettdev/flightaware2loki/pkg/alloy"
 	"github.com/burnettdev/flightaware2loki/pkg/flightaware"
-	"github.com/burnettdev/flightaware2loki/pkg/loki"
 	"github.com/joho/godotenv"
 )
 
@@ -24,8 +24,8 @@ func main() {
 	defer cancel()
 
 	// Initialize Loki client
-	lokiURL := os.Getenv("LOKI_URL")
-	lokiClient := loki.NewClient(lokiURL)
+	alloyURL := os.Getenv("ALLOY_URL")
+	alloyClient := alloy.NewClient(alloyURL)
 
 	// Create a ticker to fetch data periodically
 	ticker := time.NewTicker(5 * time.Second)
@@ -39,7 +39,7 @@ func main() {
 	for {
 		select {
 		case <-ticker.C:
-			if err := flightaware.FetchAndPushToLoki(ctx, lokiClient); err != nil {
+			if err := flightaware.FetchAndPushToLoki(ctx, alloyClient); err != nil {
 				log.Printf("Error fetching and pushing data: %v", err)
 			}
 		case <-sigChan:

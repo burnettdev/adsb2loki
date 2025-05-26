@@ -8,12 +8,12 @@ import (
 	"os"
 	"time"
 
-	"github.com/burnettdev/flightaware2loki/pkg/loki"
+	"github.com/burnettdev/flightaware2loki/pkg/alloy"
 	"github.com/burnettdev/flightaware2loki/pkg/models"
 )
 
 // FetchAndPushToLoki fetches aircraft data from FlightAware and pushes it to Loki
-func FetchAndPushToLoki(ctx context.Context, lokiClient *loki.Client) error {
+func FetchAndPushToLoki(ctx context.Context, alloyClient *alloy.Client) error {
 	// Fetch data from FlightAware
 	resp, err := http.Get(os.Getenv("SKYAWARE_URL"))
 	if err != nil {
@@ -28,7 +28,7 @@ func FetchAndPushToLoki(ctx context.Context, lokiClient *loki.Client) error {
 	}
 
 	// Convert aircraft data to Loki entries
-	entries := make([]loki.LogEntry, 0, len(data.Aircraft))
+	entries := make([]alloy.LogEntry, 0, len(data.Aircraft))
 	for _, aircraft := range data.Aircraft {
 		// Create a JSON string of the aircraft data
 		aircraftJSON, err := json.Marshal(aircraft)
@@ -42,7 +42,7 @@ func FetchAndPushToLoki(ctx context.Context, lokiClient *loki.Client) error {
 		}
 
 		// Create the log entry
-		entry := loki.LogEntry{
+		entry := alloy.LogEntry{
 			Timestamp: time.Unix(int64(data.Now), 0),
 			Labels:    labels,
 			Line:      string(aircraftJSON),
@@ -52,7 +52,7 @@ func FetchAndPushToLoki(ctx context.Context, lokiClient *loki.Client) error {
 	}
 
 	// Push to Loki
-	if err := lokiClient.PushLogs(ctx, entries); err != nil {
+	if err := alloyClient.PushLogs(ctx, entries); err != nil {
 		return fmt.Errorf("failed to push logs to Loki: %w", err)
 	}
 
