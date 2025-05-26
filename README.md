@@ -12,9 +12,10 @@
 
 ## Prerequisites
 
-- Go 1.21 or later
+- Go 1.24 or later
 - FlightAware SkyAware instance
-- Grafana Loki instance
+- Grafana Alloy
+- Grafana Loki instance (Cloud or OSS)
 
 ## Configuration
 
@@ -22,7 +23,7 @@ Create a `.env` file in the project root with the following variables:
 
 ```env
 SKYAWARE_URL=http://your-skyaware-instance/skyaware/data/aircraft.json
-LOKI_URL=http://your-loki-instance:3100
+ALLOY_URL=http://your-alloy-instance
 ```
 
 ## Installation
