@@ -61,7 +61,6 @@ temp/
 dist/
 build/
 bin/
-pkg/
 
 # Database files
 *.db
