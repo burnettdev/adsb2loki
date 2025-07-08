@@ -20,7 +20,7 @@
 Create a `.env` file in the project root with the following variables:
 
 ```env
-FLIGHT_DATA_URL=http://your-skyaware-instance/skyaware/data/aircraft.json
+FLIGHT_DATA_URL=http://your-flightdata-instance/skyaware/data/aircraft.json
 LOKI_URL=http://your-loki-instance
 
 # Optional: For Grafana Cloud Logs authentication
@@ -61,7 +61,7 @@ Set the `LOG_LEVEL` environment variable to control logging verbosity:
 - `info`: Shows info, warn, and error logs (default)
 - `warn`: Shows only warning and error logs
 - `error`: Shows only error logs
-```
+
 
 ## Installation
 
@@ -99,9 +99,8 @@ docker build -t adsb2loki .
 # Run the container
 docker run -d \
   --name adsb2loki \
-  -e FLIGHT_DATA_URL=http://your-skyaware-instance/skyaware/data/aircraft.json \
+  -e FLIGHT_DATA_URL=http://your-flightdata-instance/skyaware/data/aircraft.json \
   -e LOKI_URL=http://your-loki-instance \
-  -e LOG_LEVEL=info \
   --restart unless-stopped \
   adsb2loki
 ```
