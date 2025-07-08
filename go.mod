@@ -1,4 +1,4 @@
-module github.com/burnettdev/flightaware2loki
+module github.com/burnettdev/adsb2loki
 
 go 1.23.0
 
