@@ -39,7 +39,7 @@
                       "spec": {
                         "direction": "backward",
                         "editorMode": "code",
-                        "expr": "{service=\"flightaware\"} |= `` | json",
+                        "expr": "{service=\"adsb\"} |= `` | json",
                         "queryType": "range"
                       }
                     },
@@ -293,7 +293,7 @@
                       "spec": {
                         "direction": "backward",
                         "editorMode": "builder",
-                        "expr": "{service=\"flightaware\"} |= `` | json | flight != ``",
+                        "expr": "{service=\"adsb\"} |= `` | json | flight != ``",
                         "queryType": "range"
                       }
                     },
@@ -449,7 +449,7 @@
                       "spec": {
                         "direction": "backward",
                         "editorMode": "builder",
-                        "expr": "sum(count by(flight) (rate({service=\"flightaware\"} |= `EZY` | json [$__auto])))",
+                        "expr": "sum(count by(flight) (rate({service=\"adsb\"} |= `EZY` | json [$__auto])))",
                         "queryType": "range"
                       }
                     },
@@ -531,7 +531,7 @@
                       "spec": {
                         "direction": "backward",
                         "editorMode": "code",
-                        "expr": "sum(count by(flight) (rate({service=\"flightaware\"} | json | squawk = `7700` [$__auto])))",
+                        "expr": "sum(count by(flight) (rate({service=\"adsb\"} | json | squawk = `7700` [$__auto])))",
                         "queryType": "range"
                       }
                     },
@@ -625,7 +625,7 @@
                   "showLineNumbers": false,
                   "showMiniMap": false
                 },
-                "content": "# ✈️ FlightAware Overview\n\nWelcome aboard! This dashboard visualizes real-time flight data sourced from the **SkyAware JSON feed**, which is parsed and streamed into **Grafana Alloy** as structured log messages.\n\nEach aircraft's latest position is extracted and displayed on the **GeoMap panel**, allowing you to track live flights with up-to-date coordinates and metadata.\n\n🚦 Active flights are determined by recent log activity — if a flight has transmitted in the past few minutes, it's considered \"active\" and will appear in counts and visualizations.\n\nStay tuned for altitude shifts, heading changes, and airspace action — all updated as it happens.\n",
+                "content": "# ✈️ ADSB Overview\n\nWelcome aboard! This dashboard visualizes real-time flight data sourced from the **SkyAware JSON feed**, which is parsed and streamed into **Grafana Alloy** as structured log messages.\n\nEach aircraft's latest position is extracted and displayed on the **GeoMap panel**, allowing you to track live flights with up-to-date coordinates and metadata.\n\n🚦 Active flights are determined by recent log activity — if a flight has transmitted in the past few minutes, it's considered \"active\" and will appear in counts and visualizations.\n\nStay tuned for altitude shifts, heading changes, and airspace action — all updated as it happens.\n",
                 "mode": "markdown"
               },
               "pluginVersion": "12.1.0-88106"
@@ -653,7 +653,7 @@
                       "spec": {
                         "direction": "backward",
                         "editorMode": "builder",
-                        "expr": "sum(count by(flight) (rate({service=\"flightaware\"} | json | flight != `` [$__auto])))",
+                        "expr": "sum(count by(flight) (rate({service=\"adsb\"} | json | flight != `` [$__auto])))",
                         "queryType": "range"
                       }
                     },
@@ -738,7 +738,7 @@
                       "spec": {
                         "direction": "backward",
                         "editorMode": "builder",
-                        "expr": "sum(count by(flight) (rate({service=\"flightaware\"} |= `RYR` | json [$__auto])))",
+                        "expr": "sum(count by(flight) (rate({service=\"adsb\"} |= `RYR` | json [$__auto])))",
                         "queryType": "range"
                       }
                     },
@@ -819,7 +819,7 @@
                       "spec": {
                         "direction": "backward",
                         "editorMode": "builder",
-                        "expr": "sum(count by(flight) (rate({service=\"flightaware\"} |= `EXS` | json [$__auto])))",
+                        "expr": "sum(count by(flight) (rate({service=\"adsb\"} |= `EXS` | json [$__auto])))",
                         "queryType": "range"
                       }
                     },
@@ -1017,6 +1017,6 @@
       "timezone": "browser",
       "to": "now"
     },
-    "title": "FlightAware Overview",
+          "title": "ADSB Overview",
     "variables": []
   }
