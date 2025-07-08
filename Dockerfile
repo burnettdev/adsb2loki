@@ -9,6 +9,9 @@ RUN go build -o app .
 
 FROM debian:bullseye-slim
 
+# Install ca-certificates for SSL certificate verification
+RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 COPY --from=builder /app/app .
