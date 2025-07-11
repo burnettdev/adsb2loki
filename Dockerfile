@@ -7,7 +7,7 @@ RUN go mod tidy
 
 RUN go build -o app .
 
-FROM debian:bullseye-slim
+FROM debian:12.11-slim
 
 # Install ca-certificates for SSL certificate verification
 RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
