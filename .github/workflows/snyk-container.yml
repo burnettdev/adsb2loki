@@ -48,7 +48,7 @@ jobs:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         SNYK_API: https://api.eu.snyk.io
       with:
-        image: your/image-to-test
+        image: burnettdev/adsb2loki
         args: --file=Dockerfile
     - name: Upload result to GitHub Code Scanning
       uses: github/codeql-action/upload-sarif@v3
