@@ -127,3 +127,8 @@ Feel free to open issues or submit pull requests!
 ## License
 
 MIT License - feel free to use this project for whatever you'd like!
+
+<img width="auth" height="150" alt="image" src="https://github.com/user-attachments/assets/cbb403e2-7042-42af-8124-422128e146e8" />
+
+ADSB2Loki is proudly part of Snyk's Open Source Programme, ensuring vulnerabilities are found sooner rather than later. You can find more information <a href="https://snyk.io/?utm_source=open-source&utm_medium=pg-ptr&utm_campaign=ref-2501-osp&utm_content=pg-cta">here.</a>
+
