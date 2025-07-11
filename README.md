@@ -8,6 +8,10 @@
 - dump1090-fa instance (such as piAware or ADS-B Feeder)
 - Grafana Loki instance (Cloud or OSS)
 
+## Demo
+
+You can view live aircraft data from an aerial located in Swansea, UK on our Grafana Dashboard found <a href="https://elfordo.grafana.net/public-dashboards/5faf150d58cd4b818e0b3d98c2d35dfd">here.</a>
+
 ## Configuration
 
 Create a `.env` file in the project root with the following variables:
