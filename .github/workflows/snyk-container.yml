@@ -50,6 +50,38 @@ jobs:
       with:
         image: burnettdev/adsb2loki
         args: --file=Dockerfile
+    - name: Sanitize SARIF file
+      run: |
+        if [ -f "snyk.sarif" ]; then
+          echo "Sanitizing SARIF file..."
+          # Use jq to replace null security severity values with 0
+          jq '
+            def fix_security_severity:
+              if type == "object" then
+                with_entries(
+                  if .key == "security-severity" and (.value == null or .value == "null") then
+                    .value = "0"
+                  else
+                    .value |= fix_security_severity
+                  end
+                )
+              elif type == "array" then
+                map(fix_security_severity)
+              else
+                .
+              end;
+            fix_security_severity
+          ' snyk.sarif > snyk_sanitized.sarif
+          
+          # Replace the original file
+          mv snyk_sanitized.sarif snyk.sarif
+          
+          echo "SARIF file sanitized successfully"
+        else
+          echo "snyk.sarif not found, skipping sanitization"
+        fi
+      shell: bash
+
     - name: Upload result to GitHub Code Scanning
       uses: github/codeql-action/upload-sarif@v3
       with:
