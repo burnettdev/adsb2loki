@@ -9,12 +9,10 @@ import (
 	"time"
 )
 
-// Logger wraps the standard slog.Logger with additional functionality
 type Logger struct {
 	*slog.Logger
 }
 
-// logLevel represents the available log levels
 type logLevel int
 
 const (
@@ -25,16 +23,13 @@ const (
 )
 
 var (
-	// Global logger instance
-	globalLogger *Logger
-	// Environment variable names that contain passwords or sensitive data
+	globalLogger     *Logger
 	sensitiveEnvVars = []string{
 		"PASSWORD", "PASS", "SECRET", "TOKEN", "KEY", "AUTH", "CREDENTIAL", "CRED",
 		"GRAFANA_PASSWORD", "API_KEY", "PRIVATE_KEY", "CERT", "PEM",
 	}
 )
 
-// parseLogLevel converts string log level to logLevel enum
 func parseLogLevel(level string) logLevel {
 	switch strings.ToLower(level) {
 	case "debug":
@@ -50,7 +45,6 @@ func parseLogLevel(level string) logLevel {
 	}
 }
 
-// toSlogLevel converts our logLevel to slog.Level
 func (l logLevel) toSlogLevel() slog.Level {
 	switch l {
 	case LevelDebug:
@@ -66,9 +60,7 @@ func (l logLevel) toSlogLevel() slog.Level {
 	}
 }
 
-// Init initializes the global logger with the specified configuration
 func Init() {
-	// Get log level from environment variable, default to "info"
 	logLevelStr := os.Getenv("LOG_LEVEL")
 	if logLevelStr == "" {
 		logLevelStr = "info"
@@ -76,11 +68,9 @@ func Init() {
 
 	logLevel := parseLogLevel(logLevelStr)
 
-	// Create a text handler that outputs in logfmt format
 	opts := &slog.HandlerOptions{
 		Level: logLevel.toSlogLevel(),
 		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
-			// Format timestamp in a more readable way
 			if a.Key == slog.TimeKey {
 				if t, ok := a.Value.Any().(time.Time); ok {
 					return slog.Attr{
@@ -98,19 +88,16 @@ func Init() {
 
 	globalLogger = &Logger{Logger: logger}
 
-	// Log initialization message
 	globalLogger.Info("Logger initialized",
 		"level", logLevelStr,
 		"format", "logfmt",
 	)
 
-	// Show environment variables in debug mode (excluding sensitive ones)
 	if logLevel == LevelDebug {
 		globalLogger.logEnvironmentVariables()
 	}
 }
 
-// Get returns the global logger instance
 func Get() *Logger {
 	if globalLogger == nil {
 		Init()
@@ -118,7 +105,6 @@ func Get() *Logger {
 	return globalLogger
 }
 
-// logEnvironmentVariables logs all environment variables except sensitive ones
 func (l *Logger) logEnvironmentVariables() {
 	envVars := make(map[string]string)
 
@@ -131,7 +117,6 @@ func (l *Logger) logEnvironmentVariables() {
 		key := parts[0]
 		value := parts[1]
 
-		// Check if this environment variable contains sensitive data
 		if l.isSensitiveEnvVar(key) {
 			envVars[key] = "[REDACTED]"
 		} else {
@@ -142,7 +127,6 @@ func (l *Logger) logEnvironmentVariables() {
 	l.Debug("Environment variables loaded", "env_vars", envVars)
 }
 
-// isSensitiveEnvVar checks if an environment variable name contains sensitive data
 func (l *Logger) isSensitiveEnvVar(varName string) bool {
 	upperVarName := strings.ToUpper(varName)
 
@@ -152,7 +136,6 @@ func (l *Logger) isSensitiveEnvVar(varName string) bool {
 		}
 	}
 
-	// Additional regex patterns for common sensitive variable patterns
 	patterns := []string{
 		`.*_PASSWORD.*`,
 		`.*_SECRET.*`,
@@ -172,17 +155,14 @@ func (l *Logger) isSensitiveEnvVar(varName string) bool {
 	return false
 }
 
-// WithContext returns a new logger with the given context
 func (l *Logger) WithContext(ctx context.Context) *Logger {
 	return &Logger{Logger: l.Logger.With()}
 }
 
-// WithField adds a field to the logger
 func (l *Logger) WithField(key string, value interface{}) *Logger {
 	return &Logger{Logger: l.Logger.With(key, value)}
 }
 
-// WithFields adds multiple fields to the logger
 func (l *Logger) WithFields(fields map[string]interface{}) *Logger {
 	args := make([]interface{}, 0, len(fields)*2)
 	for k, v := range fields {
@@ -191,32 +171,26 @@ func (l *Logger) WithFields(fields map[string]interface{}) *Logger {
 	return &Logger{Logger: l.Logger.With(args...)}
 }
 
-// Debug logs a debug message with optional key-value pairs
 func (l *Logger) Debug(msg string, args ...interface{}) {
 	l.Logger.Debug(msg, args...)
 }
 
-// Info logs an info message with optional key-value pairs
 func (l *Logger) Info(msg string, args ...interface{}) {
 	l.Logger.Info(msg, args...)
 }
 
-// Warn logs a warning message with optional key-value pairs
 func (l *Logger) Warn(msg string, args ...interface{}) {
 	l.Logger.Warn(msg, args...)
 }
 
-// Error logs an error message with optional key-value pairs
 func (l *Logger) Error(msg string, args ...interface{}) {
 	l.Logger.Error(msg, args...)
 }
 
-// DebugCall logs a debug message for function calls
 func (l *Logger) DebugCall(functionName string, args ...interface{}) {
 	l.Logger.Debug("Function call", append([]interface{}{"function", functionName}, args...)...)
 }
 
-// DebugHTTP logs HTTP request/response details
 func (l *Logger) DebugHTTP(method, url string, statusCode int, duration time.Duration, args ...interface{}) {
 	baseArgs := []interface{}{
 		"method", method,
@@ -227,7 +201,6 @@ func (l *Logger) DebugHTTP(method, url string, statusCode int, duration time.Dur
 	l.Logger.Debug("HTTP call", append(baseArgs, args...)...)
 }
 
-// Package-level convenience functions
 func Debug(msg string, args ...interface{}) {
 	Get().Debug(msg, args...)
 }
