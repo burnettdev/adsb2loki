@@ -22,9 +22,10 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Setup Snyk CLI
-      uses: snyk/actions/setup@v2
+      uses: snyk/actions/setup@master
       with:
-        version: 'latest' # or pin to a version like '1.1050.0'
+        version: 'latest'  # or pin a specific version like '1.1020.0'
+
 
     - name: Build Docker image
       run: docker build -t burnettdev/adsb2loki .
