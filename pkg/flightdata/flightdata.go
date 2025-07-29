@@ -46,7 +46,7 @@ func FetchAndPushToLoki(ctx context.Context, lokiClient *loki.Client) error {
 
 	entries := make([]loki.LogEntry, 0, len(data.Aircraft))
 	for i, aircraft := range data.Aircraft {
-		logging.Debug("Processing aircraft", "index", i, "hex", aircraft.Hex, "flight", aircraft.Flight, "lat", aircraft.Lat, "lon", aircraft.Lon)
+		logging.Debug("Processing aircraft", "index", i, "hex", aircraft.Hex, "flight", aircraft.Flight, "lat", aircraft.Lat, "lon", aircraft.Lon, "alt_baro", aircraft.AltBaro.String())
 
 		aircraftJSON, err := json.Marshal(aircraft)
 		if err != nil {
