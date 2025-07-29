@@ -10,7 +10,7 @@ type Dump1090fa struct {
 		R              string        `json:"r"`
 		T              string        `json:"t"`
 		Desc           string        `json:"desc"`
-		AltBaro        int           `json:"alt_baro,omitempty"`
+		AltBaro        string        `json:"alt_baro,omitempty"`
 		AltGeom        int           `json:"alt_geom,omitempty"`
 		Gs             float64       `json:"gs,omitempty"`
 		Ias            int           `json:"ias,omitempty"`

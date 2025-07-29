@@ -11,7 +11,6 @@ import (
 	"github.com/burnettdev/adsb2loki/pkg/logging"
 )
 
-// Client represents a Loki client
 type Client struct {
 	url      string
 	client   *http.Client
@@ -19,7 +18,6 @@ type Client struct {
 	password string
 }
 
-// NewClient creates a new Loki client
 func NewClient(url string) *Client {
 	logging.DebugCall("NewClient", "url", url)
 
@@ -34,7 +32,6 @@ func NewClient(url string) *Client {
 	return client
 }
 
-// NewClientWithAuth creates a new Loki client with Grafana Cloud authentication
 func NewClientWithAuth(url, tenantID, password string) *Client {
 	logging.DebugCall("NewClientWithAuth", "url", url, "tenant_id", tenantID, "password_set", password != "")
 
@@ -51,14 +48,12 @@ func NewClientWithAuth(url, tenantID, password string) *Client {
 	return client
 }
 
-// LogEntry represents a single log entry to be sent to Loki
 type LogEntry struct {
 	Timestamp time.Time
 	Labels    map[string]string
 	Line      string
 }
 
-// PushLogs sends log entries to Loki
 func (c *Client) PushLogs(ctx context.Context, entries []LogEntry) error {
 	logging.DebugCall("PushLogs", "entries_count", len(entries))
 
@@ -67,7 +62,6 @@ func (c *Client) PushLogs(ctx context.Context, entries []LogEntry) error {
 		return nil
 	}
 
-	// Create the request payload
 	streams := make([]map[string]interface{}, 0)
 	for _, entry := range entries {
 		stream := map[string]interface{}{
@@ -83,7 +77,6 @@ func (c *Client) PushLogs(ctx context.Context, entries []LogEntry) error {
 		"streams": streams,
 	}
 
-	// Marshal the payload
 	data, err := json.Marshal(payload)
 	if err != nil {
 		logging.Error("Failed to marshal Loki payload", "error", err, "entries_count", len(entries))
@@ -92,7 +85,6 @@ func (c *Client) PushLogs(ctx context.Context, entries []LogEntry) error {
 
 	logging.Debug("Loki payload marshaled", "payload_size", len(data), "streams_count", len(streams))
 
-	// Create the request
 	url := c.url + "/loki/api/v1/push"
 	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewReader(data))
 	if err != nil {
@@ -101,13 +93,11 @@ func (c *Client) PushLogs(ctx context.Context, entries []LogEntry) error {
 	}
 	req.Header.Set("Content-Type", "application/json")
 
-	// Add authentication for Grafana Cloud if configured
 	if c.tenantID != "" && c.password != "" {
 		req.SetBasicAuth(c.tenantID, c.password)
 		logging.Debug("Added basic authentication to request", "tenant_id", c.tenantID)
 	}
 
-	// Send the request
 	start := time.Now()
 	resp, err := c.client.Do(req)
 	duration := time.Since(start)
@@ -118,10 +108,8 @@ func (c *Client) PushLogs(ctx context.Context, entries []LogEntry) error {
 	}
 	defer resp.Body.Close()
 
-	// Log the HTTP response
 	logging.DebugHTTP("POST", url, resp.StatusCode, duration, "entries_count", len(entries))
 
-	// Check for authentication errors
 	if resp.StatusCode == http.StatusUnauthorized {
 		logging.Error("Authentication failed", "status", resp.Status, "tenant_id", c.tenantID)
 		return fmt.Errorf("authentication failed: %s", resp.Status)
