@@ -14,13 +14,16 @@ import (
 )
 
 func main() {
+	// Load .env file before initializing logger so LOG_LEVEL is available
+	envErr := godotenv.Load()
+
 	logging.Init()
 	logger := logging.Get()
 
 	logger.DebugCall("main")
 
-	if err := godotenv.Load(); err != nil {
-		logger.Warn("Environment file not found", "error", err)
+	if envErr != nil {
+		logger.Debug("Environment file not found (this is normal in production)", "error", envErr)
 	} else {
 		logger.Debug("Environment file loaded successfully")
 	}

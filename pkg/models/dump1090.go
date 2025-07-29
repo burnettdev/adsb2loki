@@ -1,5 +1,36 @@
 package models
 
+import (
+	"encoding/json"
+	"fmt"
+)
+
+// FlexibleString can unmarshal both strings and numbers from JSON
+type FlexibleString string
+
+func (fs *FlexibleString) UnmarshalJSON(data []byte) error {
+	// Try to unmarshal as string first
+	var s string
+	if err := json.Unmarshal(data, &s); err == nil {
+		*fs = FlexibleString(s)
+		return nil
+	}
+	
+	// If that fails, try as number and convert to string
+	var n float64
+	if err := json.Unmarshal(data, &n); err == nil {
+		*fs = FlexibleString(fmt.Sprintf("%.0f", n))
+		return nil
+	}
+	
+	return fmt.Errorf("cannot unmarshal %s into FlexibleString", string(data))
+}
+
+// String returns the string value
+func (fs FlexibleString) String() string {
+	return string(fs)
+}
+
 type Dump1090fa struct {
 	Now      float64 `json:"now"`
 	Messages int     `json:"messages"`
@@ -10,7 +41,7 @@ type Dump1090fa struct {
 		R              string        `json:"r"`
 		T              string        `json:"t"`
 		Desc           string        `json:"desc"`
-		AltBaro        string        `json:"alt_baro,omitempty"`
+		AltBaro        FlexibleString `json:"alt_baro,omitempty"`
 		AltGeom        int           `json:"alt_geom,omitempty"`
 		Gs             float64       `json:"gs,omitempty"`
 		Ias            int           `json:"ias,omitempty"`
