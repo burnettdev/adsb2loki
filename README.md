@@ -17,7 +17,7 @@ You can view live aircraft data from an aerial located in Swansea, UK on our Gra
 Create a `.env` file in the project root with the following variables:
 
 ```env
-FLIGHT_DATA_URL=http://your-flightdata-instance/skyaware/data/aircraft.json
+FLIGHT_DATA_URL=http://your-flightdata-instance/data/aircraft.json
 LOKI_URL=http://your-loki-instance
 
 # Optional: For Grafana Cloud Logs authentication
@@ -42,9 +42,9 @@ GRAFANA_PASSWORD=glc_eyJvIjoiNzg5MDkxIiwibiI6InRlc3QiLCJrIjoi...
 
 **Note**: 
 - The `GRAFANA_TENANT_ID` is your Grafana Cloud Logs Tenant ID
-- The `GRAFANA_PASSWORD` is your Grafana Cloud API key (not your login password)
-- You can find your Logs Tenant ID in your Grafana Cloud portal
-- Create an API key in your Grafana Cloud settings with appropriate permissions Logs Write
+- The `GRAFANA_PASSWORD` is your Grafana Cloud Access Token (not your login password)
+- You can find your Logs Tenant ID in your Grafana Cloud Admin Portal
+- Create an Access Token in the Grafana Cloud Admin Portal with appropriate permissions of Logs Write
 
 ### Logging Configuration
 
@@ -96,7 +96,7 @@ docker build -t adsb2loki .
 # Run the container
 docker run -d \
   --name adsb2loki \
-  -e FLIGHT_DATA_URL=http://your-flightdata-instance/skyaware/data/aircraft.json \
+  -e FLIGHT_DATA_URL=http://your-flightdata-instance/data/aircraft.json \
   -e LOKI_URL=http://your-loki-instance \
   --restart unless-stopped \
   adsb2loki
@@ -107,7 +107,7 @@ Pull from Github Container Registry:
 # Run the container
 docker run -d \
   --name ghcr.io/burnettdev/adsb2loki:latest \
-  -e FLIGHT_DATA_URL=http://your-flightdata-instance/skyaware/data/aircraft.json \
+  -e FLIGHT_DATA_URL=http://your-flightdata-instance/data/aircraft.json \
   -e LOKI_URL=http://your-loki-instance \
   --restart unless-stopped \
   adsb2loki
