@@ -21,24 +21,23 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set up Snyk CLI
-      uses: snyk/actions/setup@v1
+    - name: Setup Snyk CLI
+      uses: snyk/actions/setup@v2
       with:
-        version: latest
+        version: 'latest' # or pin to a version like '1.1050.0'
 
     - name: Build Docker image
       run: docker build -t burnettdev/adsb2loki .
 
     - name: Run Snyk container test and generate SARIF
       continue-on-error: true
-      run: |
-        snyk config set api=$SNYK_TOKEN
-        snyk container test burnettdev/adsb2loki \
-          --file=Dockerfile \
-          --sarif-file-output=snyk.sarif
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         SNYK_API: https://api.eu.snyk.io
+      run: |
+        snyk container test burnettdev/adsb2loki \
+          --file=Dockerfile \
+          --sarif-file-output=snyk.sarif
 
     - name: Sanitize SARIF file
       run: |
@@ -66,7 +65,6 @@ jobs:
         else
           echo "No SARIF file found to sanitize."
         fi
-      shell: bash
 
     - name: Upload SARIF to GitHub Code Scanning
       uses: github/codeql-action/upload-sarif@v3
