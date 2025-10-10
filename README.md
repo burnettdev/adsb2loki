@@ -71,7 +71,7 @@ The application supports distributed tracing using OpenTelemetry. This is option
 #### Environment Variables
 
 - `OTEL_TRACING_ENABLED`: Set to `true` or `1` to enable tracing
-- `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`: OTLP HTTP endpoint for traces (default: `http://localhost:4318/v1/traces`)
+- `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`: OTLP HTTP endpoint for traces (default: `localhost:4318`)
 - `OTEL_EXPORTER_OTLP_ENDPOINT`: Alternative way to set the endpoint (will append `/v1/traces`)
 - `OTEL_EXPORTER_OTLP_TRACES_HEADERS`: Headers for trace export (format: `key1=value1,key2=value2`)
 - `OTEL_EXPORTER_OTLP_HEADERS`: Alternative way to set headers
@@ -89,27 +89,6 @@ When tracing is enabled, the application will create spans for:
 - **HTTP requests**: Individual HTTP requests to Loki (`loki.http_request`)
 
 Each span includes relevant attributes like HTTP status codes, durations, aircraft counts, and error information.
-
-#### Integration with Jaeger
-
-To use with Jaeger (a popular tracing backend):
-
-```bash
-# Start Jaeger (all-in-one)
-docker run -d --name jaeger \
-  -p 16686:16686 \
-  -p 14250:14250 \
-  -p 14268:14268 \
-  -p 4317:4317 \
-  -p 4318:4318 \
-  jaegertracing/all-in-one:latest
-
-# Configure adsb2loki
-export OTEL_TRACING_ENABLED=true
-export OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4318/v1/traces
-```
-
-Then view traces at `http://localhost:16686`
 
 
 ## Installation
@@ -151,7 +130,7 @@ docker run -d \
   -e FLIGHT_DATA_URL=http://your-flightdata-instance/data/aircraft.json \
   -e LOKI_URL=http://your-loki-instance \
   -e OTEL_TRACING_ENABLED=true \
-  -e OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://jaeger:4318/v1/traces \
+  -e OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=localhost:4318 \
   --restart unless-stopped \
   adsb2loki
 ```
@@ -164,7 +143,7 @@ docker run -d \
   -e FLIGHT_DATA_URL=http://your-flightdata-instance/data/aircraft.json \
   -e LOKI_URL=http://your-loki-instance \
   -e OTEL_TRACING_ENABLED=true \
-  -e OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://jaeger:4318/v1/traces \
+  -e OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=localhost:4318 \
   --restart unless-stopped \
   ghcr.io/burnettdev/adsb2loki:latest
 ```
