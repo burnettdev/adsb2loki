@@ -7,6 +7,8 @@ import (
 	"regexp"
 	"strings"
 	"time"
+
+	"go.opentelemetry.io/otel/trace"
 )
 
 type Logger struct {
@@ -156,6 +158,15 @@ func (l *Logger) isSensitiveEnvVar(varName string) bool {
 }
 
 func (l *Logger) WithContext(ctx context.Context) *Logger {
+	// Extract trace context if available
+	span := trace.SpanFromContext(ctx)
+	if span.SpanContext().IsValid() {
+		spanCtx := span.SpanContext()
+		return &Logger{Logger: l.Logger.With(
+			"trace_id", spanCtx.TraceID().String(),
+			"span_id", spanCtx.SpanID().String(),
+		)}
+	}
 	return &Logger{Logger: l.Logger.With()}
 }
 
@@ -231,4 +242,30 @@ func WithField(key string, value interface{}) *Logger {
 
 func WithFields(fields map[string]interface{}) *Logger {
 	return Get().WithFields(fields)
+}
+
+// Context-aware logging functions that automatically include trace information
+
+func DebugCtx(ctx context.Context, msg string, args ...interface{}) {
+	Get().WithContext(ctx).Debug(msg, args...)
+}
+
+func InfoCtx(ctx context.Context, msg string, args ...interface{}) {
+	Get().WithContext(ctx).Info(msg, args...)
+}
+
+func WarnCtx(ctx context.Context, msg string, args ...interface{}) {
+	Get().WithContext(ctx).Warn(msg, args...)
+}
+
+func ErrorCtx(ctx context.Context, msg string, args ...interface{}) {
+	Get().WithContext(ctx).Error(msg, args...)
+}
+
+func DebugCallCtx(ctx context.Context, functionName string, args ...interface{}) {
+	Get().WithContext(ctx).DebugCall(functionName, args...)
+}
+
+func DebugHTTPCtx(ctx context.Context, method, url string, statusCode int, duration time.Duration, args ...interface{}) {
+	Get().WithContext(ctx).DebugHTTP(method, url, statusCode, duration, args...)
 }
