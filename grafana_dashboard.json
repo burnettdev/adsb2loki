@@ -727,6 +727,7 @@
             "mode": "thresholds"
           },
           "mappings": [],
+          "noValue": "No Ryanair Aircraft",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -795,6 +796,7 @@
             "mode": "thresholds"
           },
           "mappings": [],
+          "noValue": "No Jet2 Aircraft",
           "thresholds": {
             "mode": "absolute",
             "steps": [
