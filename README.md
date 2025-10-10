@@ -10,7 +10,7 @@
 
 ## Demo
 
-You can view live aircraft data from an aerial located in Swansea, UK on our Grafana Dashboard found <a href="https://elfordo.grafana.net/public-dashboards/5faf150d58cd4b818e0b3d98c2d35dfd">here.</a>
+You can view live aircraft data from an aerial located in Bristol, UK on our Grafana Dashboard found <a href="https://elfordo.grafana.net/public-dashboards/5faf150d58cd4b818e0b3d98c2d35dfd">here.</a>
 
 ## Configuration
 
@@ -26,6 +26,11 @@ GRAFANA_PASSWORD=your-grafana-api-key
 
 # Logging Configuration
 LOG_LEVEL=info
+
+# OpenTelemetry Tracing Configuration (Optional)
+OTEL_TRACING_ENABLED=true
+OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=localhost:4318
+OTEL_TRACES_SAMPLER=always_on
 ```
 
 ### Authentication Options
@@ -58,6 +63,32 @@ Set the `LOG_LEVEL` environment variable to control logging verbosity:
 - `info`: Shows info, warn, and error logs (default)
 - `warn`: Shows only warning and error logs
 - `error`: Shows only error logs
+
+### OpenTelemetry Tracing Configuration
+
+The application supports distributed tracing using OpenTelemetry. This is optional and disabled by default.
+
+#### Environment Variables
+
+- `OTEL_TRACING_ENABLED`: Set to `true` or `1` to enable tracing
+- `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`: OTLP HTTP endpoint for traces (default: `localhost:4318`)
+- `OTEL_EXPORTER_OTLP_ENDPOINT`: Alternative way to set the endpoint (will append `/v1/traces`)
+- `OTEL_EXPORTER_OTLP_TRACES_HEADERS`: Headers for trace export (format: `key1=value1,key2=value2`)
+- `OTEL_EXPORTER_OTLP_HEADERS`: Alternative way to set headers
+- `OTEL_EXPORTER_OTLP_TRACES_INSECURE`: Set to `true` for insecure connections
+- `OTEL_TRACES_SAMPLER`: Sampling strategy (`always_on`, `always_off`, `traceidratio`)
+
+#### Trace Information
+
+When tracing is enabled, the application will create spans for:
+
+- **Main fetch cycle**: Overall operation span (`adsb2loki.fetch_cycle`)
+- **HTTP data fetch**: Fetching aircraft data from dump1090-fa (`flightdata.fetch_http`)
+- **JSON parsing**: Parsing the aircraft data (`flightdata.parse_json`)
+- **Loki operations**: Pushing data to Loki (`flightdata.push_to_loki`, `loki.PushLogs`)
+- **HTTP requests**: Individual HTTP requests to Loki (`loki.http_request`)
+
+Each span includes relevant attributes like HTTP status codes, durations, aircraft counts, and error information.
 
 
 ## Installation
@@ -98,6 +129,8 @@ docker run -d \
   --name adsb2loki \
   -e FLIGHT_DATA_URL=http://your-flightdata-instance/data/aircraft.json \
   -e LOKI_URL=http://your-loki-instance \
+  -e OTEL_TRACING_ENABLED=true \
+  -e OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=localhost:4318 \
   --restart unless-stopped \
   adsb2loki
 ```
@@ -106,11 +139,13 @@ Pull from Github Container Registry:
 ```bash
 # Run the container
 docker run -d \
-  --name ghcr.io/burnettdev/adsb2loki:latest \
+  --name adsb2loki \
   -e FLIGHT_DATA_URL=http://your-flightdata-instance/data/aircraft.json \
   -e LOKI_URL=http://your-loki-instance \
+  -e OTEL_TRACING_ENABLED=true \
+  -e OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=localhost:4318 \
   --restart unless-stopped \
-  adsb2loki
+  ghcr.io/burnettdev/adsb2loki:latest
 ```
 
 ## Usage
