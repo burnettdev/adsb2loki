@@ -33,21 +33,12 @@ func main() {
 	defer cancel()
 
 	// Initialize OpenTelemetry tracing
-	tracingShutdown, err := tracing.InitTracing(ctx)
+	shutdownTracing, err := tracing.InitTracing()
 	if err != nil {
 		logger.Error("Failed to initialize OpenTelemetry tracing", "error", err)
 		// Continue without tracing rather than failing
-	} else {
-		defer func() {
-			shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
-			defer shutdownCancel()
-			if err := tracingShutdown(shutdownCtx); err != nil {
-				logger.Error("Failed to shutdown OpenTelemetry tracing", "error", err)
-			} else {
-				logger.Debug("OpenTelemetry tracing shutdown successfully")
-			}
-		}()
 	}
+	defer shutdownTracing()
 
 	lokiURL := os.Getenv("LOKI_URL")
 	logger.Debug("Loki URL configuration", "url", lokiURL)
@@ -80,17 +71,12 @@ func main() {
 		case <-ticker.C:
 			logger.Debug("Ticker fired - fetching data")
 
-			// Create a span for the entire fetch and push operation
-			fetchCtx, span := tracing.StartSpan(ctx, "adsb2loki.fetch_cycle")
-
-			if err := flightdata.FetchAndPushToLoki(fetchCtx, lokiClient); err != nil {
+			if err := flightdata.FetchAndPushToLoki(ctx, lokiClient); err != nil {
 				logger.Error("Error fetching and pushing data", "error", err)
-				tracing.SetSpanError(fetchCtx, err)
 			} else {
 				logger.Debug("Data fetch and push completed successfully")
 			}
 
-			span.End()
 		case sig := <-sigChan:
 			logger.Info("Received shutdown signal", "signal", sig)
 			logger.Debug("Graceful shutdown initiated")
