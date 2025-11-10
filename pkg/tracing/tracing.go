@@ -112,24 +112,33 @@ func isTrue(s string) bool {
 func getOTLPEndpoint() string {
 	// Check for traces-specific endpoint first
 	if endpoint := getEnv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT", ""); endpoint != "" {
-		// Remove /v1/traces suffix if present since WithEndpoint handles the path separately
-		if strings.HasSuffix(endpoint, "/v1/traces") {
-			return strings.TrimSuffix(endpoint, "/v1/traces")
-		}
-		return endpoint
+		return cleanEndpoint(endpoint)
 	}
 
 	// Fall back to general OTLP endpoint
 	if endpoint := getEnv("OTEL_EXPORTER_OTLP_ENDPOINT", ""); endpoint != "" {
-		// Remove /v1/traces suffix if present
-		if strings.HasSuffix(endpoint, "/v1/traces") {
-			return strings.TrimSuffix(endpoint, "/v1/traces")
-		}
-		return endpoint
+		return cleanEndpoint(endpoint)
 	}
 
 	// Default to localhost
 	return "localhost:4318"
+}
+
+// cleanEndpoint removes protocol and path from endpoint URL
+func cleanEndpoint(endpoint string) string {
+	// Remove http:// or https:// prefix if present
+	endpoint = strings.TrimPrefix(endpoint, "http://")
+	endpoint = strings.TrimPrefix(endpoint, "https://")
+	
+	// Remove /v1/traces suffix if present since WithEndpoint handles the path separately
+	if strings.HasSuffix(endpoint, "/v1/traces") {
+		endpoint = strings.TrimSuffix(endpoint, "/v1/traces")
+	}
+	
+	// Remove any trailing slashes
+	endpoint = strings.TrimSuffix(endpoint, "/")
+	
+	return endpoint
 }
 
 // parseHeaders parses header string in format "key1=value1,key2=value2"
